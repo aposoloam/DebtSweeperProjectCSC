@@ -1,4 +1,4 @@
-//Project for CSC 1061
+//Project for CSC 1061 -- no commenting yet because I'm lazy and on ritalin
 
 
 import javafx.application.Application;
@@ -118,7 +118,7 @@ public class DebtSweeper extends Application {
         grid.setVgap(10);
         grid.setHgap(10);
 
-        Label nameLabel = new Label("Name:");
+        Label nameLabel = new Label("Name for Debt:");
         TextField nameInput = new TextField();
         Label debtLabel = new Label("Debt:");
         TextField debtInput = new TextField();

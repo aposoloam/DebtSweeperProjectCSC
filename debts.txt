@@ -1,1 +1,2 @@
-car payment:3855.5999999999995
+Car Payment:5100.0
+Mortage:1080.0
