@@ -1,2 +1,0 @@
-Car Payment:5100.0
-Mortage:1080.0
