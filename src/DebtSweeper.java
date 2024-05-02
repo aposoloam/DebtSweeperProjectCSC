@@ -2,7 +2,7 @@
  * 05/01/2024
  * CSC 1061, Patrick McDougle
  * A GUI Program to Help Users Understand Debt
- * Check README.md for more information
+ * Check README.md and User Manual.md for more information on usage
  */
 
 import javafx.application.Application;
@@ -264,7 +264,7 @@ public class DebtSweeper extends Application {
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> primaryStage.setScene(createDebtCalculationScene(primaryStage)));
         grid.add(backButton, 0, 4);
-        
+
         return new Scene(grid, 400, 300);
     }
 private Scene createPaymentScene(Stage primaryStage) {
@@ -318,6 +318,7 @@ private Scene createPaymentScene(Stage primaryStage) {
             alert.setContentText("Payment of $" + paymentAmount + " has been applied to " + debtName
                     + ". Remaining debt: $" + remainingDebt);
             alert.showAndWait();
+            displayFinancialTip();
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
