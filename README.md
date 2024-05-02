@@ -14,7 +14,4 @@ JavaFX can be downloaded from [Gluon](https://gluonhq.com/products/javafx/)
 
 ## Contributing
 
-Pull requests are welcome. For major changes, please open an issue first
-to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
+This is a private project, honestly I don't know why you'd be contributing in the first place.
