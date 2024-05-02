@@ -1,5 +1,8 @@
-//Project for CSC 1061, haven't commented anything because i'm lazy
-
+/* Peyton Cleaver
+ * 05/01/2024
+ * CSC 1061, Patrick McDougle
+ * A GUI Program to Help Users Understand Debt
+ */
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -7,10 +10,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -29,7 +34,8 @@ public class DebtSweeper extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("Debt Calculator");
+        primaryStage.setTitle("DebtSweeper: the Debt Calculator");
+        primaryStage.getIcons().add(new Image("file:icon.png"));
         loadCredentialsFromFile();
         loadDebtsFromFile();
         Scene loginScene = createLoginScene(primaryStage);
@@ -38,6 +44,7 @@ public class DebtSweeper extends Application {
     }
 
     private Scene createLoginScene(Stage primaryStage) {
+        primaryStage.setTitle("DebtSweeper: the Debt Calculator");
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(20));
         grid.setVgap(10);
@@ -73,6 +80,7 @@ public class DebtSweeper extends Application {
     }
 
     private Scene createRegistrationScene(Stage primaryStage) {
+        primaryStage.setTitle("Register");
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(20));
         grid.setVgap(10);
@@ -113,6 +121,7 @@ public class DebtSweeper extends Application {
     }
 
     private Scene createDebtCalculationScene(Stage primaryStage) {
+        primaryStage.setTitle("Enter a New Debt");
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(20));
         grid.setVgap(10);
@@ -141,13 +150,18 @@ public class DebtSweeper extends Application {
         calculateButton.setOnAction(e -> {
             try {
                 String name = nameInput.getText();
-                double debtAmount = Double.parseDouble(debtInput.getText());
+                if(!debts.containsKey(name)){
+                    double debtAmount = Double.parseDouble(debtInput.getText());
                 double interestRate = Double.parseDouble(interestRateInput.getText());
                 double futureDebt = calculateFutureDebt(debtAmount, interestRate);
                 debts.put(name, futureDebt);
                 saveDebtsToFile();
                 showAlert(AlertType.INFORMATION, "Calculation Complete",
                         "Future debt for " + name + " is: $" + String.format("%.2f", futureDebt));
+                }else{
+                    showAlert(AlertType.ERROR, "Input Failed", "Debt name already exists.");
+                }
+                
             } catch (NumberFormatException ex) {
                 showAlert(AlertType.ERROR, "Calculation Error",
                         "Please ensure that debt and interest rate are valid numbers.");
@@ -162,6 +176,7 @@ public class DebtSweeper extends Application {
     }
 
     private Scene createViewDebtsScene(Stage primaryStage) {
+        primaryStage.setTitle("View Your Debts");
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(20));
         grid.setVgap(10);
@@ -177,13 +192,88 @@ public class DebtSweeper extends Application {
         grid.add(debtsArea, 0, 0);
 
         Button backButton = new Button("Back");
-        grid.add(backButton, 0, 1);
+        grid.add(backButton, 0, 2);
         GridPane.setColumnSpan(debtsArea, 2);
         GridPane.setColumnSpan(backButton, 2);
 
+        Button updatePaymentButton = new Button("Update Payment");
+        grid.add(updatePaymentButton, 0, 1);
+
         backButton.setOnAction(e -> primaryStage.setScene(createDebtCalculationScene(primaryStage)));
+        updatePaymentButton.setOnAction(e -> primaryStage.setScene(createPaymentUpdateScene(primaryStage)));
 
         return new Scene(grid, 400, 300);
+    }
+    
+    private Scene createPaymentUpdateScene(Stage primaryStage) {
+    primaryStage.setTitle("Make a Payment");
+    GridPane grid = new GridPane();
+    grid.setPadding(new Insets(10, 10, 10, 10));
+    grid.setVgap(10);
+    grid.setHgap(10);
+
+    ComboBox<String> debtComboBox = new ComboBox<>();
+    debtComboBox.getItems().addAll(debts.keySet()); // add all debt names to the combo box
+    debtComboBox.setPromptText("Select a debt");
+    GridPane.setConstraints(debtComboBox, 0, 0);
+
+    TextField paymentInput = new TextField();
+    paymentInput.setPromptText("Payment Amount");
+    GridPane.setConstraints(paymentInput, 0, 1);
+
+    Button applyPaymentButton = new Button("Apply Payment");
+    applyPaymentButton.setOnAction(e -> {
+        if (debtComboBox.getValue() != null) {
+            applyPayment(debtComboBox.getValue(), Double.parseDouble(paymentInput.getText()));
+            primaryStage.setScene(createViewDebtsScene(primaryStage)); // return to debt view after payment
+            displayFinancialTip();
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Error", "Please select a debt from the list.");
+        }
+    });
+    GridPane.setConstraints(applyPaymentButton, 1, 1);
+
+    Button backButton = new Button("Back");
+    backButton.setOnAction(e -> primaryStage.setScene(createViewDebtsScene(primaryStage)));
+    GridPane.setConstraints(backButton, 0, 3);
+
+    grid.getChildren().addAll(debtComboBox, paymentInput, applyPaymentButton, backButton);
+
+    return new Scene(grid, 300, 200);
+}
+    
+public void applyPayment(String debtName, double paymentAmount) {
+        if (debts.containsKey(debtName)) {
+            double newAmount = debts.get(debtName) - paymentAmount;
+            debts.put(debtName, Math.max(newAmount, 0)); // prevent negative values
+            saveDebtsToFile();
+            
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Payment Applied");
+            alert.setHeaderText(null);
+            alert.setContentText("Payment of $" + paymentAmount + " has been applied to " + debtName);
+            alert.showAndWait();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("No debt found with the name: " + debtName);
+            alert.showAndWait();
+        }
+    }
+    public void displayFinancialTip() {
+        double totalDebt = debts.values().stream().mapToDouble(Double::doubleValue).sum();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Financial Tip");
+        alert.setHeaderText(null);
+        if (totalDebt > 5000) {
+            alert.setContentText("Consider consolidating your debts to reduce interest rates.");
+        } else if (totalDebt > 0) {
+            alert.setContentText("Keep up the good work, and try to pay off smaller debts first!");
+        } else {
+            alert.setContentText("Congratulations on having no debt! Keep managing your finances wisely.");
+        }
+        alert.showAndWait();
     }
 
     private double calculateFutureDebt(double debtAmount, double interestRate) {
