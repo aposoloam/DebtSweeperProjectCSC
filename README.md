@@ -10,7 +10,7 @@ git clone https://github.com/aposoloam/DebtSweeperProjectCSC
 ```
 
 You will need to have an IDE with JavaFX Support and run the DebtSweeper.java file, currently there is not a standalone .exe file.
-JavaFX can be downloaded from [Gluon] (https://gluonhq.com/products/javafx/)
+JavaFX can be downloaded from [Gluon](https://gluonhq.com/products/javafx/)
 
 ## Contributing
 
