@@ -14,4 +14,4 @@ JavaFX can be downloaded from [Gluon](https://gluonhq.com/products/javafx/)
 
 ## Contributing
 
-This is a private project, honestly I don't know why you'd be contributing in the first place.
+This is a private project for CS110, honestly I don't know why you'd be contributing in the first place but feel free!
